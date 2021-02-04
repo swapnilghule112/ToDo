@@ -1,0 +1,52 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href= "{% static 'todoApp/css/login.css'%}">
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li>
+          <h3><a href="">Micro Task Manager</a></h3>
+        </li>
+      </ul>
+      <ul class="about-register">
+        <li>
+          <a class="btn" href="#"> About</a>
+        </li>
+        <li>
+          <a class="btn" href="/todo/accounts/signup/"> Sign Up</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  {% for message in messages %}
+    <div class="alert alert-success">
+        <a class="close" href="#" data-dismiss="alert">×</a>
+        {{ message }}
+    </div>
+  {% endfor %}
+
+  
+<div class="login-form">
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" name="username" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" autocomplete="off">
+      </div> 
+        <input class="btn submit-btn" type="submit" value="login" />
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+</div>
+</body>
+</html>

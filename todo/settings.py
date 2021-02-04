@@ -122,5 +122,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'uploads')
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/todo/accounts/login'

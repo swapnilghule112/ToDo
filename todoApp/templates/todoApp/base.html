@@ -1,14 +1,137 @@
+{% load static %}
+{% get_media_prefix %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tasks manager</title>
+    <script type="text/javascript" src="{% static 'todoApp/js/index.js'%}"></script>
 </head>
 <body>
-    {% for task in tasks %}
-        {{ task.task_name }}
-    {% endfor %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet", href="{% static 'todoApp/css/styles.css' %}">
+
+    <div id="mySidebar" class="sidebar">
+        <a href="#" style="margin-bottom: 20px;"><span class="material-icons" style="color: blue;">perm_identity</span> My Account</a>
+        <a href="#" onclick="toggleCategories()"><span style="color: blue;"><i class="material-icons" >task_alt</i><span class="icon-text" style="color: black;">Tasks <i class="material-icons" id="drop-down" style="color: blue;">arrow_drop_down</i></span></a><br>
+        <div class="category-wrapper">
+            {% for category,count in categories %}
+                <div class="category capitalize"> <a href="#">{{ category }} </a> <div class="category-count"> {{count}}</div></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="main">
+        <nav class="tasks-nav">
+                <ul class="nav-ul date-bar">
+                    <li><span class="material-icons" style="color: #c0c0c0;">insert_invitation </span> <a href="#" class="nav-link">{{date}} </a> </li>
+                </ul>
+                <ul class="nav-ul search-bar">
+                    <input type="text" class="search-input" placeholder="Type into search" style="margin-left: 10em;">
+                    <button class="search-btn" type="submit">Search</button>
+                </ul>
+                <ul class="nav-ul profile-bar">
+                    <li>
+                        <div class="user-profile" onclick="toggleProfileDropdown()">
+                            <img class="user-img" src="{{profile_pic}}" alt="user-img" height="50" width="50">
+                            <div style="line-height: 3em; margin-left: 1em; color: #3f3535;">
+                                {{ username }}
+                            </div>
+                            <i class="material-icons" id="profile-drop-down-arrow" style="line-height: 2em;">arrow_drop_down</i>
+                        </div>
+                    </li>
+                    <li class="profile-bar-menu">
+                        <div class="profile-dropdown" style="display: none;">
+                            <span><a href="#">My Account </a></span>
+                            <span><a href="/accounts/logout"> Logout</a></span>
+                        </div>
+                    </li>
+                </ul>
+        </nav>
+        <div class="main-area">
+            <div class="headline">
+                <h4 style="position: relative; top: 2em;" class="capitalize">{{default_cat}} <span style="color: #c0c0c0; margin-top: 2em;">({{default_cat_cnt}})</span></h4>
+                <button type="button" id="modalBtn" class="search-btn new-task button" onclick="showModal()">
+                    + New Task
+                  </button>
+                </div>
+            <section class="task-card-container">
+            {% for task in tasks %}
+                    <div class="task-card" id={{task.id}}>
+                        <div class="card-due-date">
+                            {% if not task.task_done %}
+                            <p style="color: #c0c0c0; font-size: 0.8em;" ><span class="material-icons" style="color: #ffb6c1; margin-right: 0.5em;">query_builder</span> Due in 2 days</p>
+                            <div class="kebab">
+                                <figure></figure>
+                                <figure class="middle"></figure>
+                                <p class="cross">x</p>
+                                <figure></figure>
+                                <ul class="dropdown">
+                                  <li onclick="deleteTask( {{ task.id }} )"><a href="#">Delete</a></li>
+                                  <li onclick="updateTask( {{ task.id }}, 'archieve' )"><a href="#">Archieve</a></li>
+                                  <li onclick="updateTask( {{ task.id }}, 'done' )"><a href="#">Mark done</a></li>
+                                </ul>
+                              </div>
+                              {% else %}
+                              <div class="kebab">
+                                  <figure></figure>
+                                  <figure class="middle"></figure>
+                                  <p class="cross">x</p>
+                                  <figure></figure>
+                                  <ul class="dropdown">
+                                    <li onclick="deleteTask( {{ task.id }} )"><a href="#">Delete</a></li>
+                                    <li onclick="updateTask( {{ task.id }}, 'archieve' )"><a href="#">Archieve</a></li>
+                                  </ul>
+                                </div>
+                              {% endif %}
+                        </div>
+                        <h4 style="margin: inherit; text-align:center;">{{task.task_name}}</h4>
+                        {% if not task.task_done %}
+                            <p style="margin: inherit; text-align: inherit; color: #3f3535;"> {{task.task_description}} </p>
+                        {% else %}
+                            <p style="margin: inherit; text-align: center; color: #3f3535;"> <span class="material-icons" style="color: green; margin-right: 10px;">check_circle</span>Completed</p>
+                        {% endif %}
+                    </div>
+            {% endfor %}
+        </section>
+        </div>
+
+
+        <div class="modal">
+            <div class="modal-content">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <label for="task-name">Task header</label>
+                        <input id="task-name" type="text" name="task_name" value="">
+                    </div>
+                    <div class="input-group">
+                        <label for="task-desc">Description</label>
+                        <input id="task-desc" type="text" name="task_desc" value="">
+                    </div>
+                    <div class="input-group">
+                        <label for="task-cat">Category</label>
+                        <input id="task-cat" type="text" name="task_cat" value="General">
+                    </div>
+                    <div class="input-group">
+                        <label for="task-alert-time">Task Alert</label>
+                        <input id="task-alert-time" type="date" name="task_alert_time">
+                    </div>
+    
+                    <div class="submit-dismiss">
+                        <button class="submit search-btn" onclick="addTask()">Add Task</button>
+                        <button class="Dismiss search-btn" onclick="hideModal()">Dismiss</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+  
+
     {% block content%}
     {% endblock %}
 </body>
