@@ -74,7 +74,7 @@ def task_list(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/accounts/login')
     
-    tasks = Task.objects.filter(author=request.user).order_by('task_created_date')
+    tasks = Task.objects.filter(author=request.user).order_by('task_alert_time')
     categories = Category.objects.filter(author=request.user)
     task_count = []
     for category in categories:
@@ -87,6 +87,12 @@ def task_list(request):
     else:
         default_cat, default_cat_cnt = 'Add tasks', 0
     date = localdate()
+    for task in tasks:
+        due_days = (task.task_alert_time - date).days
+        if(due_days < 0):
+            setattr(task, "due_days", "0")
+        else:
+            setattr(task, "due_days", due_days)
     date = date.strftime("%d %B %Y")
     try:
         profile_pic = request.user.profile.photo.url
@@ -117,9 +123,9 @@ class NewTaskAPI(APIView):
             task_alert_time = datetime.datetime.strptime(task_alert_time, "%Y-%m-%d")
 
             try:
-                category_obj = Category.objects.get(category_name=task_category)
+                category_obj = Category.objects.get(category_name=task_category.lower())
             except Exception as e:
-                category_obj = Category.objects.create(category_name=task_category.lower())
+                category_obj = Category.objects.create(author=user,category_name=task_category.lower())
             
             task = Task.objects.create(author=user, task_name=task_name, task_description=task_description, task_category=category_obj, task_alert_time=task_alert_time)
             task.add_task()

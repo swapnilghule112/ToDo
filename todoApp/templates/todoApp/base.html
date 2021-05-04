@@ -62,7 +62,7 @@
                     <div class="task-card" id={{task.id}}>
                         <div class="card-due-date">
                             {% if not task.task_done %}
-                            <p style="color: #c0c0c0; font-size: 0.8em;" ><span class="material-icons" style="color: #ffb6c1; margin-right: 0.5em;">query_builder</span> Due in 2 days</p>
+                            <p style="color: #c0c0c0; font-size: 0.8em;" ><span class="material-icons" style="color: #ffb6c1; margin-right: 0.5em;">query_builder</span> Due in {{task.due_days}} days</p>
                             <div class="kebab">
                                 <figure></figure>
                                 <figure class="middle"></figure>
@@ -127,7 +127,6 @@
                 </form>
             </div>
         </div>
-
 
     </div>
   
